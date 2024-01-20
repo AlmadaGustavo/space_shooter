@@ -131,6 +131,7 @@ while True:
                 collisions_to_remove.append((yellow_ship, bullet))
                 score += 1
 
+    # Collision
     for yellow_ship, bullet in collisions_to_remove:
         yellow_ships.remove(yellow_ship)
         bullets.remove(bullet)
