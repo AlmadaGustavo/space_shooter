@@ -1,6 +1,7 @@
 import pygame
 import sys
 
+
 pygame.init()
 
 WIDTH = 600
@@ -9,7 +10,10 @@ screen = pygame.display.set_mode((WIDTH, HEIGHT))
 
 
 
-player = pygame.image.load("assets/player (1).png")
+player = pygame.image.load('assets/player (1).png')
+player= pygame.transform.scale(player, (150, 150))
+heart = pygame.image.load('assets/heart.png')
+heart = pygame.transform.scale(heart, (100, 50))
 x_sprite = 275
 y_sprite = 450
 
@@ -17,6 +21,7 @@ GREY = (212, 218, 212)
 PURPLE = (153, 51, 153)
 
 score = 0
+life = 3
 
 while True:
     screen.blit(player, (x_sprite, y_sprite), (0, 0, WIDTH, HEIGHT))
@@ -52,3 +57,20 @@ while True:
     score_text = score_font.render(f'Score: {score}', True, GREY)
     score_text_rect = score_text.get_rect()
     screen.blit(score_text, (350, 30))
+
+    life_font = pygame.font.Font('assets/PressStart2P (1).ttf', 20)
+    life_text = life_font.render('Life:', True, GREY)
+    screen.blit(life_text, (20, 30))
+
+    if life == 3:
+        screen.blit(heart, (100, 0))
+        screen.blit(heart, (150, 0))
+        screen.blit(heart, (200, 0))
+    elif life == 2:
+        screen.blit(heart, (100, 0))
+        screen.blit(heart, (150, 0))
+    else:
+        screen.blit(heart, (100, 0))
+
+
+
