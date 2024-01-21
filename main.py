@@ -23,10 +23,12 @@ green_shield_ship_sprite = pygame.image.load('assets/green_ship.png')
 green_shield_ship_sprite = pygame.transform.scale(green_shield_ship_sprite, (100, 100))
 yellow_ship_one = pygame.image.load('assets/yellow_ship.png')
 yellow_ship_one = pygame.transform.scale(yellow_ship_one, (100, 100))
+shoot_sound = pygame.mixer.Sound('sounds/shoot.wav')
 x_sprite = 275
 y_sprite = 450
 
-
+volume = 0.1
+shoot_sound.set_volume(volume)
 
 # Bullet stats
 bullet_speed = 15
@@ -76,6 +78,8 @@ while True:
                 is_shooting = True
                 bullet = {'x': x_sprite + 25, 'y': y_bullet, 'speed': bullet_speed}  # Create bullet
                 bullets.append(bullet)
+                shoot_sound.play()
+
         else:
             is_shooting = False
 
@@ -150,11 +154,16 @@ while True:
         else:
             screen.blit(green_ship_sprite, (green_ship['x'], green_ship['y']))
 
-        # Verificar colisão com o chão
         if green_ship['y'] > HEIGHT - 100:
             green_ships.remove(green_ship)
 
-        # Verificar colisão com os tiros do jogador
+        player_rect = pygame.Rect(x_sprite, y_sprite, 150, 150)
+        green_enemy_rect = pygame.Rect(green_ship['x'], green_ship['y'], 100, 100)
+
+        if player_rect.colliderect(green_enemy_rect):
+            green_ships.remove(green_ship)
+            life -= 1
+
         for bullet in bullets.copy():
             bullet_rect = pygame.Rect(bullet['x'], bullet['y'], 50, 50)
             green_ship_rect = pygame.Rect(green_ship['x'], green_ship['y'], 100, 100)
