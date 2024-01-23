@@ -115,6 +115,7 @@ score = 0
 life = 3
 
 while True:
+
     if life <= 0:
         show_defeat_screen()
         for event in pygame.event.get():
@@ -147,7 +148,7 @@ while True:
             elif event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_SPACE and not is_shooting:
                     is_shooting = True
-                    bullet = {'x': x_sprite + 25, 'y': y_bullet, 'speed': bullet_speed}  # Create bullet
+                    bullet = {'x': x_sprite + 25, 'y': y_bullet - 10, 'speed': bullet_speed, 'hit': False, 'ship': False}  # Create bullet
                     bullets.append(bullet)
                     shoot_sound.play()
             else:
@@ -164,7 +165,12 @@ while True:
 
         # Bullet update
         for bullet in bullets:
+            # Move bullet
             bullet['y'] -= bullet['speed']
+
+            # Bounce off the side walls
+            if bullet['x'] <= 0 or bullet['x'] >= WIDTH - 50:  # Consider the width of the bullet
+                bullet['speed'] *= -1  # Reverse the vertical direction
 
         # Delete bullet
         new_bullets = []
@@ -189,7 +195,7 @@ while True:
             if yellow_ship['y'] > HEIGHT - 100:
                 yellow_ships.remove(yellow_ship)
 
-            player_rect = pygame.Rect(x_sprite, y_sprite, 150, 150)
+            player_rect = pygame.Rect(x_sprite, y_sprite, 100, 100)
             yellow_ship_rect = pygame.Rect(yellow_ship['x'], yellow_ship['y'], 100, 100)
 
             if player_rect.colliderect(yellow_ship_rect):
@@ -199,11 +205,20 @@ while True:
             # Collide player bullet
             for bullet in bullets.copy():
                 bullet_rect = pygame.Rect(bullet['x'], bullet['y'], 50, 50)
+                if bullet_rect.colliderect(player_rect) and bullet['hit'] == False:
+                    life -= 1
+                    bullet['hit'] = True
                 yellow_ship_rect = pygame.Rect(yellow_ship['x'], yellow_ship['y'], 75, 75)
-
-                if bullet_rect.colliderect(yellow_ship_rect):
-                    collisions_to_remove.append((yellow_ship, bullet))
+                if bullet_rect.colliderect(yellow_ship_rect) and bullet['ship'] == False:
+                    # Invert bullet direction
+                    bullet['speed'] *= -1
+                    bullet['ship'] = True
+                    # Increase score or any other logic
                     score += 1
+                    try:
+                        yellow_ships.remove(yellow_ship)
+                    except ValueError:
+                        ...
 
         # Collision
         for yellow_ship, bullet in collisions_to_remove:
@@ -230,8 +245,8 @@ while True:
             if green_ship['y'] > HEIGHT - 100:
                 green_ships.remove(green_ship)
 
-            player_rect = pygame.Rect(x_sprite, y_sprite, 150, 150)
-            green_enemy_rect = pygame.Rect(green_ship['x'], green_ship['y'], 100, 100)
+            player_rect = pygame.Rect(x_sprite, y_sprite, 100, 100)
+            green_enemy_rect = pygame.Rect(green_ship['x'], green_ship['y'], 150, 150)
 
             if player_rect.colliderect(green_enemy_rect):
                 green_ships.remove(green_ship)
@@ -239,23 +254,29 @@ while True:
 
             for bullet in bullets.copy():
                 bullet_rect = pygame.Rect(bullet['x'], bullet['y'], 50, 50)
+                if bullet_rect.colliderect(player_rect) and bullet['hit'] == False:
+                    life -= 1
+                    bullet['hit'] = True
+
                 green_ship_rect = pygame.Rect(green_ship['x'], green_ship['y'], 100, 100)
 
-                if bullet_rect.colliderect(green_ship_rect):
+                if bullet_rect.colliderect(green_ship_rect) and bullet['ship'] == False:
                     collisions_to_remove.append((green_ship, bullet))
                     if green_ship['has_shield']:
                         green_ship['shield_health'] -= 1
                         if green_ship['shield_health'] <= 0:
                             green_ship['has_shield'] = False
+                            bullet['speed'] *= -1
+                            bullet['ship'] = True
                     else:
                         try:
                             green_ships.remove(green_ship)
+                            bullet['speed'] *= -1
+                            bullet['ship'] = True
                             score += 3
                         except ValueError:
                             ...
-                    bullets.remove(bullet)
-
-                    # Hud
+        # Hud
         pygame.draw.line(screen, GREY, [0, 70], [0, HEIGHT], 10)
         pygame.draw.line(screen, GREY, [WIDTH, 70], [WIDTH, HEIGHT], 10)
 
