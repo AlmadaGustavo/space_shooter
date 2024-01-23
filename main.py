@@ -96,7 +96,7 @@ GREY = (212, 218, 212)
 PURPLE = (153, 51, 153)
 
 # Ship
-yellow_ship_speed = 5
+yellow_ship_speed = 10
 yellow_ships = []
 
 create_yellow_ship_timer = 0
